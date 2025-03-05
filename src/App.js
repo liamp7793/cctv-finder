@@ -50,10 +50,17 @@ const CCTVFinder = () => {
 
   return (
     <div className="h-screen w-full flex flex-col items-center bg-gray-100">
-      <header className="w-full bg-gray-900 text-white text-center p-4 shadow-md flex flex-col items-center justify-center">
-        <img src="https://i.ibb.co/1frLh2fc/DALL-E-2025-03-05-21-30-02-A-sleek-modern-logo-representing-CCTV-surveillance-and-searching-The-desi.webp[/img" alt="CCTV Finder Logo" className="w-full max-w-5xl" />
-        <h1 className="text-3xl font-semibold mt-2">CCTV Finder</h1>
+      <header className="w-full bg-gray-900 text-white text-center shadow-md">
+        <img src="https://i.ibb.co/Rp4vtYhQ/DALL-E-2025-03-05-21-35-01-A-sleek-modern-logo-representing-CCTV-surveillance-and-searching-featurin.webp" alt="CCTV Finder Logo" className="w-full" />
       </header>
+      <div className="relative w-full max-w-5xl">
+        <button
+          className="absolute top-4 right-4 bg-gray-700 text-white p-4 rounded-full shadow-lg"
+          onClick={() => setShowMenu(!showMenu)}
+        >
+          ☰
+        </button>
+      </div>
       <div className="flex space-x-2 p-4 bg-white shadow-md rounded-md w-full max-w-5xl mt-4">
         <input
           type="text"
