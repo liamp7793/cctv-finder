@@ -52,9 +52,19 @@ const CCTVFinder = () => {
       <header className="w-full bg-gray-900 text-white text-center shadow-md">
         <img src="https://i.ibb.co/Rp4vtYh/DALL-E-2025-03-05-21-35-01-A-sleek-modern-logo-representing-CCTV-surveillance-and-searching-featurin.webp" alt="CCTV Finder Logo" className="w-full object-cover" />
       </header>
-      <div className="relative w-full max-w-5xl">
+      <div className="relative w-full max-w-5xl flex flex-col items-center mt-4">
+        <div className="flex space-x-2 w-full max-w-lg">
+          <input
+            type="text"
+            placeholder="Search address..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="p-2 border rounded-md flex-1"
+          />
+          <button onClick={handleSearch} className="p-2 bg-blue-600 text-white rounded">Search</button>
+        </div>
         <button
-          className="absolute top-4 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
+          className="mt-4 bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
           onClick={() => setShowForm(!showForm)}
         >
           ➕
