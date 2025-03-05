@@ -60,8 +60,8 @@ const CCTVFinder = () => {
         />
         <button onClick={handleSearch} className="p-2 bg-blue-500 text-white rounded">Search</button>
       </div>
-      <div className="border-2 border-gray-300 w-full max-w-5xl h-[80vh] relative">
-        <MapContainer center={mapCenter} zoom={mapZoom} className="h-full w-full">
+      <div className="border-2 border-gray-300 w-full max-w-5xl" style={{ height: "80vh" }}>
+        <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }}>
           <ChangeView center={mapCenter} zoom={mapZoom} />
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {searchLocation && (
