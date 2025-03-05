@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -9,17 +9,28 @@ const customIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
 
+const ChangeView = ({ center }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+  return null;
+};
+
 const CCTVFinder = () => {
   const [markers, setMarkers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [newMarker, setNewMarker] = useState({ name: "", location: "", viewingAngle: "", position: null });
+  const [mapCenter, setMapCenter] = useState([51.505, -0.09]);
 
   const handleSearch = async () => {
     if (!searchQuery) return;
     const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`);
     const data = await response.json();
     if (data.length > 0) {
-      setNewMarker({ ...newMarker, position: [data[0].lat, data[0].lon], location: searchQuery });
+      const position = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+      setNewMarker({ ...newMarker, position, location: searchQuery });
+      setMapCenter(position);
     }
   };
 
@@ -44,10 +55,11 @@ const CCTVFinder = () => {
         <button onClick={handleSearch} className="p-2 bg-blue-500 text-white rounded">Search</button>
       </div>
       <MapContainer
-        center={[51.505, -0.09]}
+        center={mapCenter}
         zoom={13}
         style={{ height: "100vh", width: "100%" }}
       >
+        <ChangeView center={mapCenter} />
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {markers.map((marker) => (
           <Marker key={marker.id} position={marker.position} icon={customIcon}>
