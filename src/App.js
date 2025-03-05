@@ -50,7 +50,9 @@ const CCTVFinder = () => {
 
   return (
     <div className="h-screen w-full flex flex-col items-center bg-gray-100">
-      <header className="w-full bg-gray-900 text-white text-center p-4 text-3xl font-semibold shadow-md">CCTV Finder</header>
+      <header className="w-full bg-gray-900 text-white text-center p-4 shadow-md flex items-center justify-center">
+        <img src="/mnt/data/A_sleek,_modern_logo_representing_CCTV_surveillanc.png" alt="CCTV Finder Logo" className="w-full max-w-5xl" />
+      </header>
       <div className="flex space-x-2 p-4 bg-white shadow-md rounded-md w-full max-w-5xl mt-4">
         <input
           type="text"
@@ -81,36 +83,6 @@ const CCTVFinder = () => {
             </Marker>
           ))}
         </MapContainer>
-        {showMenu && (
-          <div className="absolute top-1/4 right-4 bg-white p-4 shadow-lg rounded-md flex flex-col space-y-2 border border-gray-300">
-            <button onClick={() => setShowForm(!showForm)} className="bg-green-600 text-white p-2 rounded">Add Pinpoint</button>
-          </div>
-        )}
-        {showForm && (
-          <div className="absolute bottom-16 right-16 bg-white p-4 shadow-lg rounded-md flex flex-col space-y-2 border border-gray-300">
-            <input
-              type="text"
-              placeholder="Camera Name"
-              value={newMarker.name}
-              onChange={(e) => setNewMarker({ ...newMarker, name: e.target.value })}
-              className="p-2 border rounded"
-            />
-            <input
-              type="text"
-              placeholder="Viewing Angle"
-              value={newMarker.viewingAngle}
-              onChange={(e) => setNewMarker({ ...newMarker, viewingAngle: e.target.value })}
-              className="p-2 border rounded"
-            />
-            <button onClick={addMarker} className="bg-blue-500 text-white p-2 rounded">Add to Map</button>
-          </div>
-        )}
-        <button
-          className="absolute bottom-4 right-4 bg-gray-700 text-white p-4 rounded-full shadow-lg"
-          onClick={() => setShowMenu(!showMenu)}
-        >
-          ☰
-        </button>
       </div>
       <footer className="w-full bg-gray-900 text-white text-center p-3 mt-4 shadow-md">© 2025 CCTV Finder | All Rights Reserved</footer>
     </div>
