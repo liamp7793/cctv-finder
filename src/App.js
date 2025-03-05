@@ -50,7 +50,7 @@ const CCTVFinder = () => {
   return (
     <div className="h-screen w-full flex flex-col items-center bg-gray-100">
       <header className="w-full bg-gray-900 text-white text-center shadow-md">
-        <img src="<a href="https://ibb.co/TBqvJYKP"><img src="https://i.ibb.co/Rp4vtYhQ/DALL-E-2025-03-05-21-35-01-A-sleek-modern-logo-representing-CCTV-surveillance-and-searching-featurin.webp" alt="CCTV Finder Logo" className="w-full object-cover" />
+        <img src="https://i.ibb.co/9msdb0Sy/DALL-E-2025-03-05-21-50-34-A-sleek-modern-logo-for-CCTV-Finder-designed-to-fit-the-full-width-of-a-w.webp" alt="CCTV Finder Logo" className="w-full object-cover" />
       </header>
       <div className="relative w-full max-w-5xl flex flex-col items-center mt-4">
         <div className="flex space-x-2 w-full max-w-lg">
