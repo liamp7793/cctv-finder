@@ -25,6 +25,7 @@ const CCTVFinder = () => {
   const [mapZoom, setMapZoom] = useState(18);
   const [searchLocation, setSearchLocation] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const handleSearch = async () => {
     if (!searchQuery) return;
@@ -60,7 +61,7 @@ const CCTVFinder = () => {
         />
         <button onClick={handleSearch} className="p-2 bg-blue-500 text-white rounded">Search</button>
       </div>
-      <div className="border-2 border-gray-300 w-full max-w-5xl" style={{ height: "80vh" }}>
+      <div className="border-2 border-gray-300 w-full max-w-5xl relative" style={{ height: "80vh" }}>
         <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }}>
           <ChangeView center={mapCenter} zoom={mapZoom} />
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -80,8 +81,13 @@ const CCTVFinder = () => {
             </Marker>
           ))}
         </MapContainer>
+        {showMenu && (
+          <div className="absolute top-1/4 right-4 bg-white p-4 shadow-md rounded-md flex flex-col space-y-2">
+            <button onClick={() => setShowForm(!showForm)} className="bg-green-500 text-white p-2 rounded">Add Pinpoint</button>
+          </div>
+        )}
         {showForm && (
-          <div className="absolute bottom-16 right-4 bg-white p-4 shadow-md rounded-md flex flex-col space-y-2">
+          <div className="absolute bottom-16 right-16 bg-white p-4 shadow-md rounded-md flex flex-col space-y-2">
             <input
               type="text"
               placeholder="Camera Name"
@@ -100,10 +106,10 @@ const CCTVFinder = () => {
           </div>
         )}
         <button
-          className="absolute bottom-4 right-4 bg-green-500 text-white p-4 rounded-full shadow-md"
-          onClick={() => setShowForm(!showForm)}
+          className="absolute bottom-4 right-4 bg-gray-700 text-white p-4 rounded-full shadow-md"
+          onClick={() => setShowMenu(!showMenu)}
         >
-          +
+          ☰
         </button>
       </div>
     </div>
