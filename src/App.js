@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -12,7 +12,6 @@ const customIcon = new L.Icon({
 const CCTVFinder = () => {
   const [markers, setMarkers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [map, setMap] = useState(null);
 
   const handleMapClick = (e) => {
     const newMarker = {
@@ -25,16 +24,6 @@ const CCTVFinder = () => {
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
   };
 
-  useEffect(() => {
-    if (map) {
-      map.on("click", handleMapClick);
-    }
-  }, [map]);
-
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
   return (
     <div className="h-screen w-full relative">
       <h1 className="text-2xl font-bold text-center p-4 bg-gray-800 text-white">CCTV Finder</h1>
@@ -43,15 +32,15 @@ const CCTVFinder = () => {
           type="text"
           placeholder="Search address..."
           value={searchQuery}
-          onChange={handleSearchChange}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="p-2 border rounded-md w-72"
         />
       </div>
       <MapContainer
         center={[51.505, -0.09]}
         zoom={13}
-        className="h-full w-full"
-        whenCreated={setMap}
+        style={{ height: "100vh", width: "100%" }}
+        whenCreated={(mapInstance) => mapInstance.on("click", handleMapClick)}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
