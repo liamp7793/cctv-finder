@@ -49,9 +49,9 @@ const CCTVFinder = () => {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col items-center">
-      <h1 className="text-2xl font-bold text-center p-4 bg-gray-800 text-white w-full">CCTV Finder</h1>
-      <div className="flex space-x-2 p-4">
+    <div className="h-screen w-full flex flex-col items-center bg-gray-100">
+      <header className="w-full bg-gray-900 text-white text-center p-4 text-3xl font-semibold shadow-md">CCTV Finder</header>
+      <div className="flex space-x-2 p-4 bg-white shadow-md rounded-md w-full max-w-5xl mt-4">
         <input
           type="text"
           placeholder="Search address..."
@@ -59,9 +59,9 @@ const CCTVFinder = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="p-2 border rounded-md w-72"
         />
-        <button onClick={handleSearch} className="p-2 bg-blue-500 text-white rounded">Search</button>
+        <button onClick={handleSearch} className="p-2 bg-blue-600 text-white rounded">Search</button>
       </div>
-      <div className="border-2 border-gray-300 w-full max-w-5xl relative" style={{ height: "80vh" }}>
+      <div className="border-4 border-gray-400 w-full max-w-5xl relative bg-white shadow-lg rounded-md overflow-hidden mt-4" style={{ height: "75vh" }}>
         <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }}>
           <ChangeView center={mapCenter} zoom={mapZoom} />
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -82,12 +82,12 @@ const CCTVFinder = () => {
           ))}
         </MapContainer>
         {showMenu && (
-          <div className="absolute top-1/4 right-4 bg-white p-4 shadow-md rounded-md flex flex-col space-y-2">
-            <button onClick={() => setShowForm(!showForm)} className="bg-green-500 text-white p-2 rounded">Add Pinpoint</button>
+          <div className="absolute top-1/4 right-4 bg-white p-4 shadow-lg rounded-md flex flex-col space-y-2 border border-gray-300">
+            <button onClick={() => setShowForm(!showForm)} className="bg-green-600 text-white p-2 rounded">Add Pinpoint</button>
           </div>
         )}
         {showForm && (
-          <div className="absolute bottom-16 right-16 bg-white p-4 shadow-md rounded-md flex flex-col space-y-2">
+          <div className="absolute bottom-16 right-16 bg-white p-4 shadow-lg rounded-md flex flex-col space-y-2 border border-gray-300">
             <input
               type="text"
               placeholder="Camera Name"
@@ -106,12 +106,13 @@ const CCTVFinder = () => {
           </div>
         )}
         <button
-          className="absolute bottom-4 right-4 bg-gray-700 text-white p-4 rounded-full shadow-md"
+          className="absolute bottom-4 right-4 bg-gray-700 text-white p-4 rounded-full shadow-lg"
           onClick={() => setShowMenu(!showMenu)}
         >
           ☰
         </button>
       </div>
+      <footer className="w-full bg-gray-900 text-white text-center p-3 mt-4 shadow-md">© 2025 CCTV Finder | All Rights Reserved</footer>
     </div>
   );
 };
