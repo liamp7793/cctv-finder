@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, CircleMarker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { Plus } from "lucide-react";
 
 const customIcon = new L.Icon({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
@@ -55,21 +54,11 @@ const CCTVFinder = () => {
       </header>
       <div className="relative w-full max-w-5xl">
         <button
-          className="absolute top-4 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center"
+          className="absolute top-4 right-4 bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
           onClick={() => setShowForm(!showForm)}
         >
-          <Plus size={24} />
+          ➕
         </button>
-      </div>
-      <div className="flex space-x-2 p-4 bg-white shadow-md rounded-md w-full max-w-5xl mt-4">
-        <input
-          type="text"
-          placeholder="Search address..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="p-2 border rounded-md w-72"
-        />
-        <button onClick={handleSearch} className="p-2 bg-blue-600 text-white rounded">Search</button>
       </div>
       {showForm && (
         <div className="absolute top-20 right-4 bg-white p-4 shadow-lg rounded-md flex flex-col space-y-2 border border-gray-300">
@@ -111,7 +100,7 @@ const CCTVFinder = () => {
           ))}
         </MapContainer>
       </div>
-      <footer className="w-full bg-gray-900 text-white text-center p-3 mt-4 shadow-md">© 2025 CCTV Finder | All Rights Reserved</footer>
+      <footer className="w-full bg-gray-900 text-white text-center p-3 mt-4 shadow-md">© 2025 CCTV Finder | All Rights Reserved | Liam Parker</footer>
     </div>
   );
 };
