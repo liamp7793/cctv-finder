@@ -47,7 +47,7 @@ const CCTVFinder = () => {
     }
   }, [markers]);
 
-  const API_URL = "https://script.google.com/macros/s/AKfycbwCjT48Hq2F4CqnnpujgnzI8qhXxDKfZvX28BpnFNNEx3fwYV79yLUZJFNJ93-10SXw/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbxF-XLSC82LZPuiBUHq9u4ESPvZTIpP0USoLwqC3AIWLUjs2JLubSPijv5_O6sZxaIJ/exec";
 
   const handleLogin = async () => {
     try {
