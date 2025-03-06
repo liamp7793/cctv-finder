@@ -64,17 +64,32 @@ const CCTVFinder = () => {
   };
 
   const handleLogin = async (email, password) => {
-    const response = await fetch("/api/login", {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ action: "login", email, password })
     });
     const data = await response.json();
     if (data.success) {
       setUser(data.user);
       localStorage.setItem("cctvUser", JSON.stringify(data.user));
     } else {
-      alert("Login failed");
+      alert("Login failed: " + data.error);
+    }
+  };
+
+  const handleSignup = async (email, password, name) => {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "signup", email, password, name })
+    });
+    const data = await response.json();
+    if (data.success) {
+      setUser(data.user);
+      localStorage.setItem("cctvUser", JSON.stringify(data.user));
+    } else {
+      alert("Signup failed.");
     }
   };
 
@@ -86,6 +101,7 @@ const CCTVFinder = () => {
           <input type="email" placeholder="Email" className="mt-2 p-2 border rounded" />
           <input type="password" placeholder="Password" className="mt-2 p-2 border rounded" />
           <button onClick={() => handleLogin("test@example.com", "password123")} className="mt-2 bg-blue-500 text-white p-2 rounded">Login</button>
+          <button onClick={() => handleSignup("test@example.com", "password123", "New User")} className="mt-2 bg-green-500 text-white p-2 rounded">Sign Up</button>
         </div>
       ) : (
         <>
@@ -99,31 +115,6 @@ const CCTVFinder = () => {
             >
               ➕
             </button>
-          </div>
-          {showForm && (
-            <div className="absolute top-20 right-4 bg-white p-4 shadow-lg rounded-md flex flex-col space-y-2 border border-gray-300">
-              <input type="text" placeholder="Camera Name" className="p-2 border rounded" onChange={(e) => setNewMarker({ ...newMarker, name: e.target.value })} />
-              <input type="text" placeholder="Viewing Angle" className="p-2 border rounded" onChange={(e) => setNewMarker({ ...newMarker, viewingAngle: e.target.value })} />
-              <button onClick={addMarker} className="bg-blue-500 text-white p-2 rounded">Add to Map</button>
-            </div>
-          )}
-          <div className="border-4 border-gray-400 w-full max-w-5xl relative bg-white shadow-lg rounded-md overflow-hidden mt-4" style={{ height: "75vh" }}>
-            <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: "100%", width: "100%" }}>
-              <ChangeView center={mapCenter} zoom={mapZoom} />
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              {markers.map((marker) => (
-                <Marker key={marker.id} position={marker.position} icon={customIcon}>
-                  <Popup>
-                    <div>
-                      <p><strong>Name:</strong> {marker.name}</p>
-                      <p><strong>Location:</strong> {marker.location}</p>
-                      <p><strong>Viewing Angle:</strong> {marker.viewingAngle}</p>
-                      <p><strong>Created By:</strong> {marker.createdBy}</p>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-            </MapContainer>
           </div>
         </>
       )}
