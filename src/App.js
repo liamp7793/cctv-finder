@@ -45,29 +45,8 @@ const CCTVFinder = () => {
     localStorage.setItem("cctvMarkers", JSON.stringify(markers));
   }, [markers]);
 
-  const handleSearch = async () => {
-    if (!searchQuery) return;
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`);
-    const data = await response.json();
-    if (data.length > 0) {
-      const position = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-      setNewMarker({ ...newMarker, position, location: searchQuery, createdBy: user?.id });
-      setMapCenter(position);
-      setMapZoom(18);
-      setSearchLocation(position);
-    }
-  };
-
-  const addMarker = () => {
-    if (newMarker.position) {
-      setMarkers([...markers, { ...newMarker, id: Date.now() }]);
-      setNewMarker({ name: "", location: "", viewingAngle: "", position: null, createdBy: null });
-      setShowForm(false);
-    }
-  };
-
   const handleLogin = async () => {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec", {
+    const response = await fetch("https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "login", email, password })
@@ -82,7 +61,7 @@ const CCTVFinder = () => {
   };
 
   const handleSignup = async () => {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec", {
+    const response = await fetch("https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "signup", email, password, name })
@@ -106,6 +85,8 @@ const CCTVFinder = () => {
           <button onClick={handleLogin} className="mt-2 bg-blue-500 text-white p-2 rounded">Login</button>
           <h2 className="text-2xl font-semibold mt-4">Sign Up</h2>
           <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="mt-2 p-2 border rounded" />
+          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2 p-2 border rounded" />
+          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 p-2 border rounded" />
           <button onClick={handleSignup} className="mt-2 bg-green-500 text-white p-2 rounded">Sign Up</button>
         </div>
       ) : (
