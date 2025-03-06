@@ -45,7 +45,7 @@ const CCTVFinder = () => {
     localStorage.setItem("cctvMarkers", JSON.stringify(markers));
   }, [markers]);
 
-  const API_URL = "https://script.google.com/macros/s/AKfycbw63oXLNBTZuBAN-dua9yLsWEHw5TUCiYMQdBGwe0-HoQPZg8zGJXELikpXt5X7QlMU/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzEWEBgnAN_6d6-Zo3DKOpTie1p1NotAFjgJt_-zUeC38rs1858TnXZlvDSM8IP-mUG/exec";
 
   const handleLogin = async () => {
     try {
