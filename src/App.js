@@ -13,7 +13,7 @@ const ChangeView = ({ center, zoom }) => {
   const map = useMap();
   useEffect(() => {
     map.setView(center, zoom);
-  }, [center, zoom, map]);
+  }, [center, zoom]);
   return null;
 };
 
@@ -42,10 +42,12 @@ const CCTVFinder = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("cctvMarkers", JSON.stringify(markers));
+    if (markers.length > 0) {
+      localStorage.setItem("cctvMarkers", JSON.stringify(markers));
+    }
   }, [markers]);
 
-  const API_URL = "https://script.google.com/macros/s/AKfycbwzhfn4dgzkXRswvppaPoqib0-504pa2gmozLN0fe1_PekyBmrwSBiOSgaPZPi0_B0R/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbwCjT48Hq2F4CqnnpujgnzI8qhXxDKfZvX28BpnFNNEx3fwYV79yLUZJFNJ93-10SXw/exec";
 
   const handleLogin = async () => {
     try {
@@ -59,8 +61,9 @@ const CCTVFinder = () => {
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
+        alert("Login successful!");
       } else {
-        alert("Login failed: " + data.error);
+        alert("Login failed: " + data.message);
       }
     } catch (error) {
       console.error("Error logging in:", error);
@@ -80,8 +83,9 @@ const CCTVFinder = () => {
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
+        alert("Signup successful! You can now log in.");
       } else {
-        alert("Signup failed.");
+        alert(`Signup failed: ${data.message}`);
       }
     } catch (error) {
       console.error("Error signing up:", error);
