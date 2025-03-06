@@ -26,6 +26,9 @@ const CCTVFinder = () => {
   const [searchLocation, setSearchLocation] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [user, setUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
 
   useEffect(() => {
     const savedMarkers = localStorage.getItem("cctvMarkers");
@@ -63,7 +66,7 @@ const CCTVFinder = () => {
     }
   };
 
-  const handleLogin = async (email, password) => {
+  const handleLogin = async () => {
     const response = await fetch("https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -78,7 +81,7 @@ const CCTVFinder = () => {
     }
   };
 
-  const handleSignup = async (email, password, name) => {
+  const handleSignup = async () => {
     const response = await fetch("https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -98,10 +101,12 @@ const CCTVFinder = () => {
       {!user ? (
         <div className="flex flex-col items-center mt-20 bg-white p-6 shadow-lg rounded-lg">
           <h2 className="text-2xl font-semibold">Login</h2>
-          <input type="email" placeholder="Email" className="mt-2 p-2 border rounded" />
-          <input type="password" placeholder="Password" className="mt-2 p-2 border rounded" />
-          <button onClick={() => handleLogin("test@example.com", "password123")} className="mt-2 bg-blue-500 text-white p-2 rounded">Login</button>
-          <button onClick={() => handleSignup("test@example.com", "password123", "New User")} className="mt-2 bg-green-500 text-white p-2 rounded">Sign Up</button>
+          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2 p-2 border rounded" />
+          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 p-2 border rounded" />
+          <button onClick={handleLogin} className="mt-2 bg-blue-500 text-white p-2 rounded">Login</button>
+          <h2 className="text-2xl font-semibold mt-4">Sign Up</h2>
+          <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="mt-2 p-2 border rounded" />
+          <button onClick={handleSignup} className="mt-2 bg-green-500 text-white p-2 rounded">Sign Up</button>
         </div>
       ) : (
         <>
