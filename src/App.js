@@ -45,33 +45,47 @@ const CCTVFinder = () => {
     localStorage.setItem("cctvMarkers", JSON.stringify(markers));
   }, [markers]);
 
+  const API_URL = "https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec";
+
   const handleLogin = async () => {
-    const response = await fetch("https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "login", email, password })
-    });
-    const data = await response.json();
-    if (data.success) {
-      setUser(data.user);
-      localStorage.setItem("cctvUser", JSON.stringify(data.user));
-    } else {
-      alert("Login failed: " + data.error);
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "login", email, password })
+      });
+      const data = await response.json();
+      console.log("Login Response:", data);
+      if (data.success) {
+        setUser(data.user);
+        localStorage.setItem("cctvUser", JSON.stringify(data.user));
+      } else {
+        alert("Login failed: " + data.error);
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      alert("Login request failed.");
     }
   };
 
   const handleSignup = async () => {
-    const response = await fetch("https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbw-RBBpcjYT75blb_E85m-Vv9catNNYeNWY7gZvsm2zaHhOpNay8cGJnf6UGVBNbOqs/exec/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "signup", email, password, name })
-    });
-    const data = await response.json();
-    if (data.success) {
-      setUser(data.user);
-      localStorage.setItem("cctvUser", JSON.stringify(data.user));
-    } else {
-      alert("Signup failed.");
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "signup", email, password, name })
+      });
+      const data = await response.json();
+      console.log("Signup Response:", data);
+      if (data.success) {
+        setUser(data.user);
+        localStorage.setItem("cctvUser", JSON.stringify(data.user));
+      } else {
+        alert("Signup failed.");
+      }
+    } catch (error) {
+      console.error("Error signing up:", error);
+      alert("Signup request failed.");
     }
   };
 
