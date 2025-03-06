@@ -47,12 +47,13 @@ const CCTVFinder = () => {
     }
   }, [markers]);
 
-  const API_URL = "https://script.google.com/macros/s/AKfycbyvcJKL7WFIXxvaCHP63IkcwznRuqGSS4w0tOwNwtZ82-p6SxUFztimbA4lzLmyBTo/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbxoxu8M3c3IR9EWnu0dR4OYRXUhQgKiDKJF-jJc-oX96iX3okvffKhaqcxNRklR3U0/exec";
 
   const handleLogin = async () => {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
+      mode: "cors", // ✅ Added this to force CORS handling
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"
@@ -77,10 +78,12 @@ const CCTVFinder = () => {
 };
 
 
+
   const handleSignup = async () => {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
+      mode: "cors", // ✅ Added this to force CORS handling
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*"
@@ -103,6 +106,7 @@ const CCTVFinder = () => {
     alert("Signup request failed.");
   }
 };
+
 
 
   return (
