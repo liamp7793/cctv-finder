@@ -47,7 +47,7 @@ const CCTVFinder = () => {
     }
   }, [markers]);
 
-  const API_URL = "https://script.google.com/macros/s/AKfycbziYA3SMAbYrCOavn8UgVvw-ncpjU5uzL69i7GHvkIT_NYObAsDTzZhoqmopxkW1FOS/exec";
+  const API_URL = "/api/auth";
 
   const handleLogin = async () => {
   try {
@@ -57,7 +57,7 @@ const CCTVFinder = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ action: "login", email, password })
+      body: JSON.stringify({ action: "login", email, password }),
     });
 
     const data = await response.json();
@@ -80,6 +80,7 @@ const CCTVFinder = () => {
 
 
 
+
   const handleSignup = async () => {
   try {
     const response = await fetch(API_URL, {
@@ -88,7 +89,7 @@ const CCTVFinder = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ action: "signup", email, password, name })
+      body: JSON.stringify({ action: "signup", email, password, name }),
     });
 
     const data = await response.json();
@@ -106,6 +107,7 @@ const CCTVFinder = () => {
     alert("Signup request failed.");
   }
 };
+
 
 
 
