@@ -1,3 +1,6 @@
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+
 const firebaseConfig = {
   apiKey: "AIzaSyBnlctkOpVp0g71o0MO9peptYbtPBJzepQ",
   authDomain: "cctv-finder-users.firebaseapp.com",
@@ -6,3 +9,8 @@ const firebaseConfig = {
   messagingSenderId: "435511062817",
   appId: "1:435511062817:web:1c0d8a9eb69d794850ce60"
 };
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+export { db };
