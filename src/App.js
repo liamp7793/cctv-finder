@@ -43,6 +43,7 @@ const CCTVFinder = () => {
         body: JSON.stringify({ action: "getAllPinpoints" })
       });
       const data = await response.json();
+      console.log("📍 Pinpoints fetched:", data.pinpoints);
       if (data.success) {
         setMarkers(data.pinpoints);
         if (data.pinpoints.length > 0) {
@@ -50,7 +51,7 @@ const CCTVFinder = () => {
         }
       }
     } catch (error) {
-      console.error("❌ Error fetching pinpoints:", error);
+      console.error("Error fetching pinpoints:", error);
     }
   };
 
@@ -122,67 +123,87 @@ const CCTVFinder = () => {
 
   return (
     <div className="h-screen w-full bg-gray-100 relative">
-      {/* ✅ Header */}
       <header className="text-center py-4 bg-gray-800 text-white text-2xl font-bold">
         CCTV Finder
       </header>
 
-      {/* ✅ Search Bar */}
-      {user && (
-        <div className="absolute top-16 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-lg">
-          <input
-            type="text"
-            placeholder="Search location..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-3 border rounded"
-          />
-          <button
-            onClick={handleSearch}
-            className="mt-2 bg-blue-500 text-white p-3 rounded w-full"
-          >
-            Search
-          </button>
-        </div>
-      )}
-
-      {/* ✅ Floating Buttons */}
-      {user && (
-        <div className="absolute top-24 right-4 z-10 flex flex-col gap-4">
-          <button
-            onClick={handleAddPinpoint}
-            className="bg-green-500 text-white p-3 rounded-full shadow-lg"
-          >
-            ➕
-          </button>
-          <button
-            onClick={handleSignOut}
-            className="bg-red-500 text-white p-3 rounded-full shadow-lg"
-          >
-            🚪
-          </button>
-        </div>
-      )}
-
-      {user && (
-        <MapContainer center={mapCenter} zoom={13} style={{ height: "80vh", width: "100%" }}>
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          {markers.map((marker) => (
-            <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={customIcon}>
-              <Popup>
-                <div>
-                  <strong>{marker.name}</strong>
-                  <p>Owner: {marker.userName}</p>
-                  <button
-                    onClick={() => alert("Request feature coming soon!")}
-                    className="mt-2 bg-blue-500 text-white p-2 rounded"
+      {!user ? (
+        <div className="h-full flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-2xl font-semibold text-center mb-4">
+              {isSignUp ? "Create an Account" : "Welcome Back"}
+            </h2>
+            {isSignUp ? (
+              <>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={signupData.name}
+                  onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={signupData.email}
+                  onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={signupData.password}
+                  onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <button onClick={handleSignup} className="w-full bg-green-500 text-white py-2 rounded">
+                  Sign Up
+                </button>
+                <p className="mt-4 text-center">
+                  Already have an account?{' '}
+                  <span
+                    className="text-blue-500 cursor-pointer"
+                    onClick={() => setIsSignUp(false)}
                   >
-                    Request Footage
-                  </button>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+                    Log in
+                  </span>
+                </p>
+              </>
+            ) : (
+              <>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={loginData.email}
+                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={loginData.password}
+                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <button onClick={handleLogin} className="w-full bg-blue-500 text-white py-2 rounded">
+                  Log In
+                </button>
+                <p className="mt-4 text-center">
+                  Don't have an account?{' '}
+                  <span
+                    className="text-blue-500 cursor-pointer"
+                    onClick={() => setIsSignUp(true)}
+                  >
+                    Sign Up
+                  </span>
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      ) : (
+        <MapContainer center={mapCenter} zoom={13} style={{ height: "100vh", width: "100%" }}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         </MapContainer>
       )}
     </div>
