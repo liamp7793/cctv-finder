@@ -14,11 +14,9 @@ const CCTVFinder = () => {
   const [user, setUser] = useState(null);
   const [isSignUp, setIsSignUp] = useState(false);
   const [markers, setMarkers] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [newMarker, setNewMarker] = useState({ name: "", lat: null, lng: null });
-  const [showAddPinForm, setShowAddPinForm] = useState(false);
 
-  // Separate state for login and signup
+  // Separate state for login and signup to prevent shared state issues
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
 
@@ -26,13 +24,14 @@ const CCTVFinder = () => {
     const savedUser = localStorage.getItem("cctvUser");
     if (savedUser) {
       setUser(JSON.parse(savedUser));
+      console.log("✅ Loaded user from local storage:", JSON.parse(savedUser));
     }
   }, []);
 
   useEffect(() => {
     if (user) {
-      console.log("✅ User is logged in");
-      fetchPinpoints(); // Load pinpoints when user logs in
+      console.log("✅ User logged in:", user);
+      fetchPinpoints();
     }
   }, [user]);
 
@@ -49,14 +48,16 @@ const CCTVFinder = () => {
 
       const data = await response.json();
       if (data.success) {
+        console.log("✅ Login successful:", data.user);
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
-        fetchPinpoints(); // Refresh pinpoints after login
+        fetchPinpoints(); // Load pinpoints after login
       } else {
         alert(`Login failed: ${data.message}`);
       }
     } catch (error) {
       console.error("❌ Login failed:", error);
+      alert("Login request failed.");
     }
   };
 
@@ -71,6 +72,7 @@ const CCTVFinder = () => {
 
       const data = await response.json();
       if (data.success) {
+        console.log("✅ Signup successful:", data.user);
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         fetchPinpoints();
@@ -79,13 +81,14 @@ const CCTVFinder = () => {
       }
     } catch (error) {
       console.error("❌ Signup failed:", error);
+      alert("Signup request failed.");
     }
   };
 
   // ✅ Save Pinpoint Handler
   const handleSavePinpoint = async () => {
     if (!newMarker.name || !newMarker.lat || !newMarker.lng) {
-      alert("Please provide name and location.");
+      alert("Please provide a valid name and location.");
       return;
     }
 
@@ -103,13 +106,12 @@ const CCTVFinder = () => {
       const data = await response.json();
       if (data.success) {
         alert("Pinpoint saved!");
-        setShowAddPinForm(false);
         fetchPinpoints();
       } else {
         alert(`Failed to save pinpoint: ${data.message}`);
       }
     } catch (error) {
-      console.error("❌ Failed to save pinpoint:", error);
+      console.error("❌ Error saving pinpoint:", error);
     }
   };
 
@@ -127,7 +129,7 @@ const CCTVFinder = () => {
         console.log("📍 Pinpoints fetched:", data.pinpoints);
         setMarkers(data.pinpoints);
       } else {
-        console.error(`❌ Failed to fetch pinpoints: ${data.message}`);
+        alert(`Failed to fetch pinpoints: ${data.message}`);
       }
     } catch (error) {
       console.error("❌ Error fetching pinpoints:", error);
@@ -199,17 +201,20 @@ const CCTVFinder = () => {
                 </button>
               </>
             )}
+            <p
+              className="text-blue-500 mt-4 cursor-pointer text-center"
+              onClick={() => setIsSignUp(!isSignUp)}
+            >
+              {isSignUp ? "Already have an account? Log in" : "Don't have an account? Sign up"}
+            </p>
           </div>
         </div>
       ) : (
-        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-full w-full">
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          {markers.map((marker) => (
-            <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={customIcon}>
-              <Popup>{marker.name}</Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        <>
+          <MapContainer center={[51.505, -0.09]} zoom={13} className="h-full w-full">
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          </MapContainer>
+        </>
       )}
     </div>
   );
