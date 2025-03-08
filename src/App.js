@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -31,7 +31,8 @@ const CCTVFinder = () => {
 
   useEffect(() => {
     if (user) {
-      fetchPinpoints();
+      console.log("✅ User is logged in");
+      fetchPinpoints(); // Load pinpoints when user logs in
     }
   }, [user]);
 
@@ -50,12 +51,12 @@ const CCTVFinder = () => {
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
-        fetchPinpoints();
+        fetchPinpoints(); // Refresh pinpoints after login
       } else {
         alert(`Login failed: ${data.message}`);
       }
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("❌ Login failed:", error);
     }
   };
 
@@ -77,7 +78,7 @@ const CCTVFinder = () => {
         alert(`Signup failed: ${data.message}`);
       }
     } catch (error) {
-      console.error("Signup failed:", error);
+      console.error("❌ Signup failed:", error);
     }
   };
 
@@ -108,7 +109,7 @@ const CCTVFinder = () => {
         alert(`Failed to save pinpoint: ${data.message}`);
       }
     } catch (error) {
-      console.error("Failed to save pinpoint:", error);
+      console.error("❌ Failed to save pinpoint:", error);
     }
   };
 
@@ -123,30 +124,13 @@ const CCTVFinder = () => {
 
       const data = await response.json();
       if (data.success) {
+        console.log("📍 Pinpoints fetched:", data.pinpoints);
         setMarkers(data.pinpoints);
-      }
-    } catch (error) {
-      console.error("Failed to fetch pinpoints:", error);
-    }
-  };
-
-  // ✅ Search Location
-  const handleSearch = async () => {
-    if (!searchQuery) return;
-    try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${searchQuery}`);
-      const data = await response.json();
-      if (data.length) {
-        setNewMarker({
-          ...newMarker,
-          lat: parseFloat(data[0].lat),
-          lng: parseFloat(data[0].lon)
-        });
       } else {
-        alert("Location not found");
+        console.error(`❌ Failed to fetch pinpoints: ${data.message}`);
       }
     } catch (error) {
-      console.error("Failed to search location:", error);
+      console.error("❌ Error fetching pinpoints:", error);
     }
   };
 
@@ -155,6 +139,7 @@ const CCTVFinder = () => {
     localStorage.removeItem("cctvUser");
     setUser(null);
     setMarkers([]);
+    alert("You have been signed out.");
   };
 
   return (
@@ -217,16 +202,14 @@ const CCTVFinder = () => {
           </div>
         </div>
       ) : (
-        <>
-          <MapContainer center={[51.505, -0.09]} zoom={13} className="h-screen w-full">
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            {markers.map((marker) => (
-              <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={customIcon}>
-                <Popup>{marker.name}</Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </>
+        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-full w-full">
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {markers.map((marker) => (
+            <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={customIcon}>
+              <Popup>{marker.name}</Popup>
+            </Marker>
+          ))}
+        </MapContainer>
       )}
     </div>
   );
