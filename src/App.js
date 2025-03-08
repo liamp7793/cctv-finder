@@ -31,11 +31,11 @@ const CCTVFinder = () => {
     }
   }, []);
 
-  // ✅ Fetch Pinpoints after User Logs In
+  // ✅ Fetch Pinpoints After Login
   useEffect(() => {
     console.log("👀 User state:", user);
 
-    if (user && (user.uid || user.id)) {
+    if (user) {
       console.log("✅ User logged in, fetching pinpoints...");
       fetchPinpoints();
     }
@@ -57,7 +57,7 @@ const CCTVFinder = () => {
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
-        fetchPinpoints(); // Load pinpoints after login
+        fetchPinpoints();
       } else {
         alert(`Login failed: ${data.message}`);
       }
@@ -83,7 +83,7 @@ const CCTVFinder = () => {
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
-        fetchPinpoints(); // Load pinpoints after signup
+        fetchPinpoints();
       } else {
         alert(`Signup failed: ${data.message}`);
       }
@@ -120,7 +120,7 @@ const CCTVFinder = () => {
       const data = await response.json();
       if (data.success) {
         alert("Pinpoint saved!");
-        fetchPinpoints(); // Refresh pinpoints
+        fetchPinpoints();
       } else {
         alert(`Failed to save pinpoint: ${data.message}`);
       }
@@ -129,16 +129,14 @@ const CCTVFinder = () => {
     }
   };
 
-  // ✅ Fetch Pinpoints
+  // ✅ Fetch All Pinpoints (Show All Users’ Pinpoints)
   const fetchPinpoints = async () => {
-    if (!user || !(user.uid || user.id)) return;
-
     try {
-      console.log("🔎 Fetching pinpoints...");
+      console.log("🔎 Fetching all pinpoints...");
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getPinpoints", userId: user.uid || user.id }),
+        body: JSON.stringify({ action: "getAllPinpoints" }), // ✅ New backend call for all users' pinpoints
       });
 
       const data = await response.json();
@@ -171,6 +169,7 @@ const CCTVFinder = () => {
             <h2 className="text-2xl font-semibold text-center mb-4">
               {isSignUp ? "Create an Account" : "Welcome Back"}
             </h2>
+
             <input
               type="email"
               placeholder="Email"
@@ -191,11 +190,19 @@ const CCTVFinder = () => {
           </div>
         </div>
       ) : (
-        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-screen w-full">
+        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-full w-full">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {markers.map((marker) => (
             <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={customIcon}>
-              <Popup>{marker.name}</Popup>
+              <Popup>
+                <div>
+                  <strong>{marker.name}</strong>
+                  <p>Added by: {marker.userName}</p>
+                  {marker.userId === (user.uid || user.id) && (
+                    <button onClick={() => alert("Edit function coming soon!")}>Edit</button>
+                  )}
+                </div>
+              </Popup>
             </Marker>
           ))}
         </MapContainer>
