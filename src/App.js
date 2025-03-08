@@ -44,8 +44,12 @@ const CCTVFinder = () => {
         body: JSON.stringify({ action: "getAllPinpoints" })
       });
       const data = await response.json();
+      console.log("📍 Pinpoints fetched:", data.pinpoints);
       if (data.success) {
         setMarkers(data.pinpoints);
+        if (data.pinpoints.length > 0) {
+          setMapCenter([data.pinpoints[0].lat, data.pinpoints[0].lng]);
+        }
       }
     } catch (error) {
       console.error("Error fetching pinpoints:", error);
@@ -180,11 +184,9 @@ const CCTVFinder = () => {
           </div>
         </div>
       ) : (
-        <>
-          <MapContainer center={mapCenter} zoom={13} className="h-[500px] w-full rounded-lg border">
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          </MapContainer>
-        </>
+        <MapContainer center={mapCenter} zoom={13} style={{ height: "100vh", width: "100%" }}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        </MapContainer>
       )}
     </div>
   );
