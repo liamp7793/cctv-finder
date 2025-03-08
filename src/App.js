@@ -14,29 +14,30 @@ const CCTVFinder = () => {
   const [user, setUser] = useState(null);
   const [isSignUp, setIsSignUp] = useState(false);
   const [markers, setMarkers] = useState([]);
-  const [newMarker, setNewMarker] = useState({ name: "", lat: null, lng: null });
-
-  // Separate state for login and signup
+  
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
+  const [newMarker, setNewMarker] = useState({ name: "", lat: null, lng: null });
 
+  const API_URL = "/api/auth";
+
+  // ✅ Load User from Local Storage
   useEffect(() => {
     const savedUser = localStorage.getItem("cctvUser");
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser);
-      console.log("✅ Loaded user from local storage:", parsedUser);
+      console.log("✅ Loaded user:", parsedUser);
       setUser(parsedUser);
     }
   }, []);
 
+  // ✅ Fetch Pinpoints after User Logs In
   useEffect(() => {
     if (user && user.uid) {
-      console.log("✅ User logged in:", user);
+      console.log("✅ User logged in, fetching pinpoints...");
       fetchPinpoints();
     }
   }, [user]);
-
-  const API_URL = "/api/auth";
 
   // ✅ Login Handler
   const handleLogin = async () => {
@@ -80,7 +81,7 @@ const CCTVFinder = () => {
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
-        fetchPinpoints();
+        fetchPinpoints(); // Load pinpoints after signup
       } else {
         alert(`Signup failed: ${data.message}`);
       }
@@ -90,7 +91,7 @@ const CCTVFinder = () => {
     }
   };
 
-  // ✅ Save Pinpoint Handler
+  // ✅ Save Pinpoint
   const handleSavePinpoint = async () => {
     if (!newMarker.name || !newMarker.lat || !newMarker.lng) {
       alert("Please provide a valid name and location.");
@@ -107,17 +108,17 @@ const CCTVFinder = () => {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          action: "savePinpoint", 
-          userId: user.uid, 
-          data: newMarker 
+        body: JSON.stringify({
+          action: "savePinpoint",
+          userId: user.uid,
+          data: newMarker,
         }),
       });
 
       const data = await response.json();
       if (data.success) {
         alert("Pinpoint saved!");
-        fetchPinpoints();
+        fetchPinpoints(); // Refresh pinpoints
       } else {
         alert(`Failed to save pinpoint: ${data.message}`);
       }
@@ -126,7 +127,7 @@ const CCTVFinder = () => {
     }
   };
 
-  // ✅ Fetch Pinpoints Handler
+  // ✅ Fetch Pinpoints
   const fetchPinpoints = async () => {
     if (!user || !user.uid) return;
 
@@ -144,14 +145,14 @@ const CCTVFinder = () => {
       if (data.success) {
         setMarkers(data.pinpoints || []);
       } else {
-        alert(`Failed to fetch pinpoints: ${data.message}`);
+        console.error("❌ Failed to fetch pinpoints:", data.message);
       }
     } catch (error) {
       console.error("❌ Error fetching pinpoints:", error);
     }
   };
 
-  // ✅ Sign Out Handler
+  // ✅ Sign Out
   const handleSignOut = () => {
     localStorage.removeItem("cctvUser");
     setUser(null);
@@ -162,6 +163,7 @@ const CCTVFinder = () => {
   return (
     <div className="h-screen w-full bg-gray-100">
       {!user ? (
+        // ✅ Login & Signup Form
         <div className="h-full flex items-center justify-center">
           <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
             <h2 className="text-2xl font-semibold text-center mb-4">
@@ -219,7 +221,7 @@ const CCTVFinder = () => {
           </div>
         </div>
       ) : (
-        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-screen w-full">
+        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-full w-full">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         </MapContainer>
       )}
