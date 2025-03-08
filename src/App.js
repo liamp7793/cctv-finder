@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-// Custom Leaflet Icon
 const customIcon = new L.Icon({
   iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
   iconSize: [25, 41],
@@ -15,13 +14,12 @@ const CCTVFinder = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [markers, setMarkers] = useState([]);
   const [newMarker, setNewMarker] = useState({ name: "", lat: null, lng: null });
-  const [mapCenter, setMapCenter] = useState([51.505, -0.09]);
+
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
 
   const API_URL = "/api/auth";
 
-  // ✅ Load User from Local Storage
   useEffect(() => {
     const savedUser = localStorage.getItem("cctvUser");
     if (savedUser) {
@@ -29,7 +27,6 @@ const CCTVFinder = () => {
     }
   }, []);
 
-  // ✅ Fetch Pinpoints After Login
   useEffect(() => {
     if (user) {
       fetchPinpoints();
@@ -45,6 +42,7 @@ const CCTVFinder = () => {
       });
 
       const data = await response.json();
+
       if (data.success) {
         setMarkers(data.pinpoints || []);
       } else {
@@ -55,7 +53,6 @@ const CCTVFinder = () => {
     }
   };
 
-  // ✅ Login Handler
   const handleLogin = async () => {
     try {
       const response = await fetch(API_URL, {
@@ -70,17 +67,14 @@ const CCTVFinder = () => {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         fetchPinpoints();
-        alert("Login successful!");
       } else {
         alert(`Login failed: ${data.message}`);
       }
     } catch (error) {
       console.error("❌ Login failed:", error);
-      alert("Login request failed.");
     }
   };
 
-  // ✅ Signup Handler
   const handleSignup = async () => {
     try {
       const response = await fetch(API_URL, {
@@ -95,25 +89,20 @@ const CCTVFinder = () => {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         fetchPinpoints();
-        alert("Signup successful!");
       } else {
         alert(`Signup failed: ${data.message}`);
       }
     } catch (error) {
-      console.error("❌ Signup request failed:", error);
-      alert("Signup request failed.");
+      console.error("❌ Signup failed:", error);
     }
   };
 
-  // ✅ Sign Out Handler
   const handleSignOut = () => {
     localStorage.removeItem("cctvUser");
     setUser(null);
     setMarkers([]);
-    alert("You have been signed out.");
   };
 
-  // ✅ Add Pinpoint Handler
   const handleAddPinpoint = () => {
     alert("Feature to add pinpoint coming soon!");
   };
@@ -122,11 +111,7 @@ const CCTVFinder = () => {
     <div className="h-screen w-full bg-gray-100">
       {/* ✅ Logo */}
       <header className="w-full bg-gray-900 text-white text-center p-4">
-        <img 
-          src="/logo.png" 
-          alt="CCTV Finder Logo" 
-          className="mx-auto w-48 h-16 object-contain" 
-        />
+        CCTV Finder
       </header>
 
       {!user ? (
@@ -187,7 +172,7 @@ const CCTVFinder = () => {
           </div>
         </div>
       ) : (
-        <MapContainer center={mapCenter} zoom={13} className="h-[600px] w-full">
+        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-[600px] w-full">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         </MapContainer>
       )}
