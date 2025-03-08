@@ -16,20 +16,21 @@ const CCTVFinder = () => {
   const [markers, setMarkers] = useState([]);
   const [newMarker, setNewMarker] = useState({ name: "", lat: null, lng: null });
 
-  // Separate state for login and signup to prevent shared state issues
+  // Separate state for login and signup
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
 
   useEffect(() => {
     const savedUser = localStorage.getItem("cctvUser");
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
-      console.log("✅ Loaded user from local storage:", JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser);
+      console.log("✅ Loaded user from local storage:", parsedUser);
+      setUser(parsedUser);
     }
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (user && user.uid) {
       console.log("✅ User logged in:", user);
       fetchPinpoints();
     }
@@ -40,6 +41,7 @@ const CCTVFinder = () => {
   // ✅ Login Handler
   const handleLogin = async () => {
     try {
+      console.log("🔎 Attempting login...");
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -47,8 +49,9 @@ const CCTVFinder = () => {
       });
 
       const data = await response.json();
+      console.log("✅ Login Response:", data);
+
       if (data.success) {
-        console.log("✅ Login successful:", data.user);
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         fetchPinpoints(); // Load pinpoints after login
@@ -64,6 +67,7 @@ const CCTVFinder = () => {
   // ✅ Signup Handler
   const handleSignup = async () => {
     try {
+      console.log("🔎 Attempting signup...");
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -71,8 +75,9 @@ const CCTVFinder = () => {
       });
 
       const data = await response.json();
+      console.log("✅ Signup Response:", data);
+
       if (data.success) {
-        console.log("✅ Signup successful:", data.user);
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         fetchPinpoints();
@@ -92,7 +97,13 @@ const CCTVFinder = () => {
       return;
     }
 
+    if (!user || !user.uid) {
+      alert("You must be logged in to save a pinpoint.");
+      return;
+    }
+
     try {
+      console.log("📍 Saving pinpoint:", newMarker);
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -117,7 +128,10 @@ const CCTVFinder = () => {
 
   // ✅ Fetch Pinpoints Handler
   const fetchPinpoints = async () => {
+    if (!user || !user.uid) return;
+
     try {
+      console.log("🔎 Fetching pinpoints...");
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -125,9 +139,10 @@ const CCTVFinder = () => {
       });
 
       const data = await response.json();
+      console.log("📍 Pinpoints fetched:", data);
+
       if (data.success) {
-        console.log("📍 Pinpoints fetched:", data.pinpoints);
-        setMarkers(data.pinpoints);
+        setMarkers(data.pinpoints || []);
       } else {
         alert(`Failed to fetch pinpoints: ${data.message}`);
       }
@@ -201,20 +216,12 @@ const CCTVFinder = () => {
                 </button>
               </>
             )}
-            <p
-              className="text-blue-500 mt-4 cursor-pointer text-center"
-              onClick={() => setIsSignUp(!isSignUp)}
-            >
-              {isSignUp ? "Already have an account? Log in" : "Don't have an account? Sign up"}
-            </p>
           </div>
         </div>
       ) : (
-        <>
-          <MapContainer center={[51.505, -0.09]} zoom={13} className="h-full w-full">
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          </MapContainer>
-        </>
+        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-screen w-full">
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        </MapContainer>
       )}
     </div>
   );
