@@ -188,6 +188,15 @@ const CCTVFinder = () => {
                 <button onClick={handleLogin} className="w-full bg-blue-500 text-white py-2 rounded">
                   Log In
                 </button>
+                <p className="mt-4 text-center">
+                  Don't have an account?{' '}
+                  <span
+                    className="text-blue-500 cursor-pointer"
+                    onClick={() => setIsSignUp(true)}
+                  >
+                    Sign Up
+                  </span>
+                </p>
               </>
             )}
           </div>
