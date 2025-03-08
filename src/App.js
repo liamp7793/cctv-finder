@@ -56,8 +56,6 @@ const CCTVFinder = () => {
 
       if (data.success) {
         setUser(data.user);
-        console.log("✅ User object set:", data.user);
-
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         fetchPinpoints(); // Load pinpoints after login
       } else {
@@ -85,7 +83,7 @@ const CCTVFinder = () => {
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
-        fetchPinpoints();
+        fetchPinpoints(); // Load pinpoints after signup
       } else {
         alert(`Signup failed: ${data.message}`);
       }
@@ -114,7 +112,7 @@ const CCTVFinder = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "savePinpoint",
-          userId: user.uid || user.id, // ✅ Handle both possible fields
+          userId: user.uid || user.id,
           data: newMarker,
         }),
       });
@@ -173,8 +171,6 @@ const CCTVFinder = () => {
             <h2 className="text-2xl font-semibold text-center mb-4">
               {isSignUp ? "Create an Account" : "Welcome Back"}
             </h2>
-
-            {/* ✅ Login / Signup Form */}
             <input
               type="email"
               placeholder="Email"
@@ -197,6 +193,11 @@ const CCTVFinder = () => {
       ) : (
         <MapContainer center={[51.505, -0.09]} zoom={13} className="h-screen w-full">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {markers.map((marker) => (
+            <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={customIcon}>
+              <Popup>{marker.name}</Popup>
+            </Marker>
+          ))}
         </MapContainer>
       )}
     </div>
