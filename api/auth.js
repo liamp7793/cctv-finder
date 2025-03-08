@@ -39,6 +39,9 @@ export default async function handler(req, res) {
       }
       const result = await getPinpoints(userId);
       return res.status(result.success ? 200 : 400).json(result);
+    } else if (action === 'getAllPinpoints') {
+      const result = await getAllPinpoints(); // ✅ New action added
+      return res.status(result.success ? 200 : 400).json(result);
     } else {
       return res.status(400).json({ success: false, message: 'Invalid action' });
     }
@@ -110,7 +113,7 @@ async function savePinpoint(userId, data) {
   }
 }
 
-// ✅ Get Pinpoints Function
+// ✅ Get Pinpoints for Logged-In User
 async function getPinpoints(userId) {
   try {
     console.log("📍 Fetching pinpoints for user:", userId);
@@ -128,6 +131,42 @@ async function getPinpoints(userId) {
     return { success: true, pinpoints };
   } catch (error) {
     console.error("❌ Error fetching pinpoints:", error.message);
+    return { success: false, message: error.message };
+  }
+}
+
+// ✅ NEW: Get All Pinpoints (Show All Users’ Pinpoints)
+async function getAllPinpoints() {
+  try {
+    console.log("🔎 Fetching ALL pinpoints...");
+
+    // ✅ Create a reference to all users' pinpoints
+    const usersRef = collection(db, 'users');
+    const usersSnapshot = await getDocs(usersRef);
+
+    let allPinpoints = [];
+
+    // ✅ Loop through each user and get their pinpoints
+    for (const userDoc of usersSnapshot.docs) {
+      const userId = userDoc.id;
+      const pinpointsRef = collection(db, `users/${userId}/pinpoints`);
+      const snapshot = await getDocs(pinpointsRef);
+
+      const userPinpoints = snapshot.docs.map(doc => ({
+        id: doc.id,
+        userId,
+        userName: userDoc.data().name, // ✅ Include user name for display
+        ...doc.data(),
+      }));
+
+      allPinpoints = [...allPinpoints, ...userPinpoints];
+    }
+
+    console.log("✅ All pinpoints fetched:", allPinpoints);
+
+    return { success: true, pinpoints: allPinpoints };
+  } catch (error) {
+    console.error("❌ Error fetching all pinpoints:", error.message);
     return { success: false, message: error.message };
   }
 }
