@@ -14,10 +14,11 @@ const CCTVFinder = () => {
   const [user, setUser] = useState(null);
   const [isSignUp, setIsSignUp] = useState(false);
   const [markers, setMarkers] = useState([]);
+  const [newMarker, setNewMarker] = useState({ name: "", lat: null, lng: null });
 
+  // Separate state for login and signup
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
-  const [newMarker, setNewMarker] = useState({ name: "", lat: null, lng: null });
 
   const API_URL = "/api/auth";
 
@@ -33,8 +34,6 @@ const CCTVFinder = () => {
 
   // ✅ Fetch Pinpoints After Login
   useEffect(() => {
-    console.log("👀 User state:", user);
-
     if (user) {
       console.log("✅ User logged in, fetching pinpoints...");
       fetchPinpoints();
@@ -44,7 +43,6 @@ const CCTVFinder = () => {
   // ✅ Login Handler
   const handleLogin = async () => {
     try {
-      console.log("🔎 Attempting login...");
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -52,12 +50,11 @@ const CCTVFinder = () => {
       });
 
       const data = await response.json();
-      console.log("✅ Login Response:", data);
 
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
-        fetchPinpoints();
+        fetchPinpoints(); // Load pinpoints after login
       } else {
         alert(`Login failed: ${data.message}`);
       }
@@ -70,7 +67,6 @@ const CCTVFinder = () => {
   // ✅ Signup Handler
   const handleSignup = async () => {
     try {
-      console.log("🔎 Attempting signup...");
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -78,7 +74,6 @@ const CCTVFinder = () => {
       });
 
       const data = await response.json();
-      console.log("✅ Signup Response:", data);
 
       if (data.success) {
         setUser(data.user);
@@ -93,7 +88,7 @@ const CCTVFinder = () => {
     }
   };
 
-  // ✅ Save Pinpoint
+  // ✅ Save Pinpoint Handler
   const handleSavePinpoint = async () => {
     if (!newMarker.name || !newMarker.lat || !newMarker.lng) {
       alert("Please provide a valid name and location.");
@@ -106,7 +101,6 @@ const CCTVFinder = () => {
     }
 
     try {
-      console.log("📍 Saving pinpoint:", newMarker);
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -120,7 +114,7 @@ const CCTVFinder = () => {
       const data = await response.json();
       if (data.success) {
         alert("Pinpoint saved!");
-        fetchPinpoints();
+        fetchPinpoints(); // Refresh pinpoints
       } else {
         alert(`Failed to save pinpoint: ${data.message}`);
       }
@@ -132,15 +126,13 @@ const CCTVFinder = () => {
   // ✅ Fetch All Pinpoints (Show All Users’ Pinpoints)
   const fetchPinpoints = async () => {
     try {
-      console.log("🔎 Fetching all pinpoints...");
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getAllPinpoints" }), // ✅ New backend call for all users' pinpoints
+        body: JSON.stringify({ action: "getAllPinpoints" }),
       });
 
       const data = await response.json();
-      console.log("📍 Pinpoints fetched:", data);
 
       if (data.success) {
         setMarkers(data.pinpoints || []);
@@ -162,6 +154,15 @@ const CCTVFinder = () => {
 
   return (
     <div className="h-screen w-full bg-gray-100">
+      {/* ✅ Logo */}
+      <header className="w-full bg-gray-900 text-white text-center p-4">
+        <img 
+          src="/logo.png" 
+          alt="CCTV Finder Logo" 
+          className="mx-auto w-48 h-16 object-contain" 
+        />
+      </header>
+
       {!user ? (
         // ✅ Login & Signup Form
         <div className="h-full flex items-center justify-center">
@@ -190,7 +191,11 @@ const CCTVFinder = () => {
           </div>
         </div>
       ) : (
-        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-full w-full">
+        <MapContainer
+          center={[51.505, -0.09]}
+          zoom={13}
+          className="h-[600px] w-full"
+        >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {markers.map((marker) => (
             <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={customIcon}>
@@ -198,9 +203,6 @@ const CCTVFinder = () => {
                 <div>
                   <strong>{marker.name}</strong>
                   <p>Added by: {marker.userName}</p>
-                  {marker.userId === (user.uid || user.id) && (
-                    <button onClick={() => alert("Edit function coming soon!")}>Edit</button>
-                  )}
                 </div>
               </Popup>
             </Marker>
