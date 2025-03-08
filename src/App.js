@@ -47,7 +47,7 @@ const CCTVFinder = () => {
     }
   }, [markers]);
 
-  const API_URL = "cctv-finder-users.firebaseapp.com";
+  const API_URL = "/api/auth";
 
   const handleLogin = async () => {
   try {
