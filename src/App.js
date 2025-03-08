@@ -47,13 +47,13 @@ const CCTVFinder = () => {
     }
   }, [markers]);
 
-  const API_URL = "/api/auth";
+  const API_URL = "cctv-finder-users.firebaseapp.com";
 
   const handleLogin = async () => {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
-      mode: "cors", // ✅ Forces CORS handling
+      mode: "cors",
       headers: {
         "Content-Type": "application/json",
       },
@@ -81,11 +81,12 @@ const CCTVFinder = () => {
 
 
 
+
   const handleSignup = async () => {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
-      mode: "cors", // ✅ Forces CORS handling
+      mode: "cors",
       headers: {
         "Content-Type": "application/json",
       },
@@ -107,6 +108,7 @@ const CCTVFinder = () => {
     alert("Signup request failed.");
   }
 };
+
 
 
 
