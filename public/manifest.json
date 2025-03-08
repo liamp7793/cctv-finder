@@ -1,5 +1,13 @@
 {
-  "name": "CCTV Finder",
-  "short_name": "CCTV",
+  "short_name": "CCTV Finder",
+  "name": "CCTV Finder App",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
   "display": "standalone"
 }
