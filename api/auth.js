@@ -33,6 +33,12 @@ export default async function handler(req, res) {
       }
       const result = await savePinpoint(userId, data);
       return res.status(result.success ? 200 : 400).json(result);
+    } else if (action === 'getPinpoints') {
+      if (!userId) {
+        return res.status(400).json({ success: false, message: 'Missing userId for fetching pinpoints' });
+      }
+      const result = await getPinpoints(userId);
+      return res.status(result.success ? 200 : 400).json(result);
     } else {
       return res.status(400).json({ success: false, message: 'Invalid action' });
     }
@@ -92,7 +98,6 @@ async function savePinpoint(userId, data) {
   try {
     console.log("📍 Saving pinpoint for user:", userId);
 
-    // Create a new document in the user's pinpoints collection
     const ref = doc(db, `users/${userId}/pinpoints`, `${Date.now()}`);
     await setDoc(ref, data);
 
@@ -101,6 +106,28 @@ async function savePinpoint(userId, data) {
     return { success: true };
   } catch (error) {
     console.error("❌ Error saving pinpoint:", error.message);
+    return { success: false, message: error.message };
+  }
+}
+
+// ✅ Get Pinpoints Function
+async function getPinpoints(userId) {
+  try {
+    console.log("📍 Fetching pinpoints for user:", userId);
+
+    const ref = collection(db, `users/${userId}/pinpoints`);
+    const snapshot = await getDocs(ref);
+
+    const pinpoints = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    console.log("✅ Pinpoints fetched:", pinpoints);
+
+    return { success: true, pinpoints };
+  } catch (error) {
+    console.error("❌ Error fetching pinpoints:", error.message);
     return { success: false, message: error.message };
   }
 }
