@@ -14,7 +14,7 @@ const CCTVFinder = () => {
   const [user, setUser] = useState(null);
   const [isSignUp, setIsSignUp] = useState(false);
   const [markers, setMarkers] = useState([]);
-  
+
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
   const [newMarker, setNewMarker] = useState({ name: "", lat: null, lng: null });
@@ -26,14 +26,16 @@ const CCTVFinder = () => {
     const savedUser = localStorage.getItem("cctvUser");
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser);
-      console.log("✅ Loaded user:", parsedUser);
+      console.log("✅ Loaded user from local storage:", parsedUser);
       setUser(parsedUser);
     }
   }, []);
 
   // ✅ Fetch Pinpoints after User Logs In
   useEffect(() => {
-    if (user && user.uid) {
+    console.log("👀 User state:", user);
+
+    if (user && (user.uid || user.id)) {
       console.log("✅ User logged in, fetching pinpoints...");
       fetchPinpoints();
     }
@@ -54,6 +56,8 @@ const CCTVFinder = () => {
 
       if (data.success) {
         setUser(data.user);
+        console.log("✅ User object set:", data.user);
+
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         fetchPinpoints(); // Load pinpoints after login
       } else {
@@ -81,7 +85,7 @@ const CCTVFinder = () => {
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
-        fetchPinpoints(); // Load pinpoints after signup
+        fetchPinpoints();
       } else {
         alert(`Signup failed: ${data.message}`);
       }
@@ -98,7 +102,7 @@ const CCTVFinder = () => {
       return;
     }
 
-    if (!user || !user.uid) {
+    if (!user || !(user.uid || user.id)) {
       alert("You must be logged in to save a pinpoint.");
       return;
     }
@@ -110,7 +114,7 @@ const CCTVFinder = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "savePinpoint",
-          userId: user.uid,
+          userId: user.uid || user.id, // ✅ Handle both possible fields
           data: newMarker,
         }),
       });
@@ -129,14 +133,14 @@ const CCTVFinder = () => {
 
   // ✅ Fetch Pinpoints
   const fetchPinpoints = async () => {
-    if (!user || !user.uid) return;
+    if (!user || !(user.uid || user.id)) return;
 
     try {
       console.log("🔎 Fetching pinpoints...");
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getPinpoints", userId: user.uid }),
+        body: JSON.stringify({ action: "getPinpoints", userId: user.uid || user.id }),
       });
 
       const data = await response.json();
@@ -170,58 +174,28 @@ const CCTVFinder = () => {
               {isSignUp ? "Create an Account" : "Welcome Back"}
             </h2>
 
-            {isSignUp ? (
-              <>
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  value={signupData.name}
-                  onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
-                  className="w-full p-2 border rounded mb-2"
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={signupData.email}
-                  onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                  className="w-full p-2 border rounded mb-2"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={signupData.password}
-                  onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                  className="w-full p-2 border rounded mb-2"
-                />
-                <button onClick={handleSignup} className="w-full bg-green-500 text-white py-2 rounded">
-                  Sign Up
-                </button>
-              </>
-            ) : (
-              <>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={loginData.email}
-                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                  className="w-full p-2 border rounded mb-2"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={loginData.password}
-                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  className="w-full p-2 border rounded mb-2"
-                />
-                <button onClick={handleLogin} className="w-full bg-blue-500 text-white py-2 rounded">
-                  Log In
-                </button>
-              </>
-            )}
+            {/* ✅ Login / Signup Form */}
+            <input
+              type="email"
+              placeholder="Email"
+              value={loginData.email}
+              onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+              className="w-full p-2 border rounded mb-2"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={loginData.password}
+              onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+              className="w-full p-2 border rounded mb-2"
+            />
+            <button onClick={handleLogin} className="w-full bg-blue-500 text-white py-2 rounded">
+              Log In
+            </button>
           </div>
         </div>
       ) : (
-        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-full w-full">
+        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-screen w-full">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         </MapContainer>
       )}
