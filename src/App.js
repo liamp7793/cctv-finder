@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+
+// Custom Leaflet Icon
+const customIcon = new L.Icon({
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
 
 const CCTVFinder = () => {
   const [user, setUser] = useState(null);
   const [isSignUp, setIsSignUp] = useState(false);
-
+  const [markers, setMarkers] = useState([]);
+  
   // Separate state for login and signup to prevent shared state issues
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
@@ -14,6 +25,12 @@ const CCTVFinder = () => {
       setUser(JSON.parse(savedUser));
     }
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchPinpoints(); // Load pinpoints when user logs in
+    }
+  }, [user]);
 
   const API_URL = "/api/auth";
 
@@ -33,6 +50,7 @@ const CCTVFinder = () => {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         alert("Login successful!");
+        fetchPinpoints();
       } else {
         alert("Login failed: " + data.message);
       }
@@ -58,6 +76,7 @@ const CCTVFinder = () => {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         alert("Signup successful! You can now log in.");
+        fetchPinpoints();
       } else {
         alert(`Signup failed: ${data.message}`);
       }
@@ -93,6 +112,7 @@ const CCTVFinder = () => {
 
       if (result.success) {
         alert('Pinpoint saved!');
+        fetchPinpoints(); // Refresh pinpoints after saving
       } else {
         alert(`Failed to save pinpoint: ${result.message}`);
       }
@@ -100,6 +120,38 @@ const CCTVFinder = () => {
       console.error("❌ Error saving pinpoint:", error.message);
       alert(`Failed to save pinpoint: ${error.message}`);
     }
+  };
+
+  // ✅ Fetch Pinpoints Handler
+  const fetchPinpoints = async () => {
+    if (!user || !user.uid) return;
+
+    try {
+      const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'getPinpoints', userId: user.uid }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setMarkers(result.pinpoints);
+      } else {
+        alert(`Failed to fetch pinpoints: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("❌ Error fetching pinpoints:", error.message);
+    }
+  };
+
+  // ✅ Sign Out Handler
+  const handleSignOut = () => {
+    localStorage.removeItem("cctvUser");
+    setUser(null);
+    setMarkers([]);
+    alert("You have been signed out.");
   };
 
   return (
@@ -125,69 +177,4 @@ const CCTVFinder = () => {
                 onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
                 className="w-full p-3 border rounded mb-4"
               />
-              <input
-                type="password"
-                placeholder="Password"
-                value={signupData.password}
-                onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                className="w-full p-3 border rounded mb-4"
-              />
-              <button
-                onClick={handleSignup}
-                className="w-full bg-green-500 text-white p-3 rounded hover:bg-green-600 transition duration-300"
-              >
-                Sign Up
-              </button>
-            </>
-          ) : (
-            <>
-              <input
-                type="email"
-                placeholder="Email"
-                value={loginData.email}
-                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                className="w-full p-3 border rounded mb-4"
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={loginData.password}
-                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                className="w-full p-3 border rounded mb-4"
-              />
-              <button
-                onClick={handleLogin}
-                className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition duration-300"
-              >
-                Log In
-              </button>
-            </>
-          )}
-
-          {/* Switch between Login and Signup */}
-          <p className="mt-4 text-center text-gray-500">
-            {isSignUp ? "Already have an account?" : "Don't have an account?"}
-            <span
-              className="text-blue-500 cursor-pointer ml-1 hover:underline"
-              onClick={() => setIsSignUp(!isSignUp)}
-            >
-              {isSignUp ? "Log in" : "Sign up"}
-            </span>
-          </p>
-        </div>
-      ) : (
-        <div className="text-center">
-          <h1 className="text-4xl font-semibold text-gray-800">Welcome, {user.email}!</h1>
-          <button
-            className="mt-6 bg-green-500 text-white p-3 rounded hover:bg-green-600"
-            onClick={handleSavePinpoint}
-          >
-            ➕ Save Pinpoint
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default CCTVFinder;
+           
