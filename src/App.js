@@ -26,16 +26,13 @@ const CCTVFinder = () => {
   useEffect(() => {
     const savedUser = localStorage.getItem("cctvUser");
     if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      console.log("✅ Loaded user from local storage:", parsedUser);
-      setUser(parsedUser);
+      setUser(JSON.parse(savedUser));
     }
   }, []);
 
   // ✅ Fetch Pinpoints After Login
   useEffect(() => {
     if (user) {
-      console.log("✅ User logged in, fetching pinpoints...");
       fetchPinpoints();
     }
   }, [user]);
@@ -66,6 +63,11 @@ const CCTVFinder = () => {
 
   // ✅ Signup Handler
   const handleSignup = async () => {
+    if (!signupData.name || !signupData.email || !signupData.password) {
+      alert("All fields are required for signup.");
+      return;
+    }
+
     try {
       const response = await fetch(API_URL, {
         method: "POST",
@@ -79,51 +81,17 @@ const CCTVFinder = () => {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         fetchPinpoints();
+        alert("Signup successful!");
       } else {
         alert(`Signup failed: ${data.message}`);
       }
     } catch (error) {
-      console.error("❌ Signup failed:", error);
+      console.error("❌ Signup request failed:", error);
       alert("Signup request failed.");
     }
   };
 
-  // ✅ Save Pinpoint Handler
-  const handleSavePinpoint = async () => {
-    if (!newMarker.name || !newMarker.lat || !newMarker.lng) {
-      alert("Please provide a valid name and location.");
-      return;
-    }
-
-    if (!user || !(user.uid || user.id)) {
-      alert("You must be logged in to save a pinpoint.");
-      return;
-    }
-
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "savePinpoint",
-          userId: user.uid || user.id,
-          data: newMarker,
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        alert("Pinpoint saved!");
-        fetchPinpoints(); // Refresh pinpoints
-      } else {
-        alert(`Failed to save pinpoint: ${data.message}`);
-      }
-    } catch (error) {
-      console.error("❌ Error saving pinpoint:", error);
-    }
-  };
-
-  // ✅ Fetch All Pinpoints (Show All Users’ Pinpoints)
+  // ✅ Fetch Pinpoints
   const fetchPinpoints = async () => {
     try {
       const response = await fetch(API_URL, {
@@ -144,7 +112,7 @@ const CCTVFinder = () => {
     }
   };
 
-  // ✅ Sign Out
+  // ✅ Sign Out Handler
   const handleSignOut = () => {
     localStorage.removeItem("cctvUser");
     setUser(null);
@@ -164,49 +132,85 @@ const CCTVFinder = () => {
       </header>
 
       {!user ? (
-        // ✅ Login & Signup Form
         <div className="h-full flex items-center justify-center">
           <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
             <h2 className="text-2xl font-semibold text-center mb-4">
               {isSignUp ? "Create an Account" : "Welcome Back"}
             </h2>
 
-            <input
-              type="email"
-              placeholder="Email"
-              value={loginData.email}
-              onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-              className="w-full p-2 border rounded mb-2"
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={loginData.password}
-              onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-              className="w-full p-2 border rounded mb-2"
-            />
-            <button onClick={handleLogin} className="w-full bg-blue-500 text-white py-2 rounded">
-              Log In
-            </button>
+            {isSignUp ? (
+              // ✅ Signup Form
+              <>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={signupData.name}
+                  onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={signupData.email}
+                  onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={signupData.password}
+                  onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <button onClick={handleSignup} className="w-full bg-green-500 text-white py-2 rounded">
+                  Sign Up
+                </button>
+                <p className="mt-4 text-center">
+                  Already have an account?{" "}
+                  <span 
+                    onClick={() => setIsSignUp(false)} 
+                    className="text-blue-500 cursor-pointer"
+                  >
+                    Log In
+                  </span>
+                </p>
+              </>
+            ) : (
+              // ✅ Login Form
+              <>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={loginData.email}
+                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={loginData.password}
+                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                  className="w-full p-2 border rounded mb-2"
+                />
+                <button onClick={handleLogin} className="w-full bg-blue-500 text-white py-2 rounded">
+                  Log In
+                </button>
+                <p className="mt-4 text-center">
+                  Don't have an account?{" "}
+                  <span 
+                    onClick={() => setIsSignUp(true)} 
+                    className="text-blue-500 cursor-pointer"
+                  >
+                    Sign Up
+                  </span>
+                </p>
+              </>
+            )}
           </div>
         </div>
       ) : (
-        <MapContainer
-          center={[51.505, -0.09]}
-          zoom={13}
-          className="h-[600px] w-full"
-        >
+        <MapContainer center={[51.505, -0.09]} zoom={13} className="h-[600px] w-full">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          {markers.map((marker) => (
-            <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={customIcon}>
-              <Popup>
-                <div>
-                  <strong>{marker.name}</strong>
-                  <p>Added by: {marker.userName}</p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
         </MapContainer>
       )}
     </div>
