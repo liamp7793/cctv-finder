@@ -177,4 +177,62 @@ const CCTVFinder = () => {
                 onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
                 className="w-full p-3 border rounded mb-4"
               />
-           
+              <input
+                type="password"
+                placeholder="Password"
+                value={signupData.password}
+                onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                className="w-full p-3 border rounded mb-4"
+              />
+              <button
+                onClick={handleSignup}
+                className="w-full bg-green-500 text-white p-3 rounded hover:bg-green-600 transition duration-300"
+              >
+                Sign Up
+              </button>
+            </>
+          ) : (
+            <>
+              <input
+                type="email"
+                placeholder="Email"
+                value={loginData.email}
+                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                className="w-full p-3 border rounded mb-4"
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={loginData.password}
+                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                className="w-full p-3 border rounded mb-4"
+              />
+              <button
+                onClick={handleLogin}
+                className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition duration-300"
+              >
+                Log In
+              </button>
+            </>
+          )}
+        </div>
+      ) : (
+        <>
+          <MapContainer center={[51.505, -0.09]} zoom={13} className="h-screen w-full">
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            {markers.map((marker) => (
+              <Marker key={marker.id} position={[marker.lat, marker.lng]} icon={customIcon}>
+                <Popup>{marker.name}</Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+          <button onClick={handleSignOut} className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded">
+            Sign Out
+          </button>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default CCTVFinder;
