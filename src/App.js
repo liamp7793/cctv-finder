@@ -1,34 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, CircleMarker } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-
-const customIcon = new L.Icon({
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-const ChangeView = ({ center, zoom }) => {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center, zoom);
-  }, [center, zoom]);
-  return null;
-};
 
 const CCTVFinder = () => {
-  const [markers, setMarkers] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [newMarker, setNewMarker] = useState({ name: "", location: "", viewingAngle: "", position: null, createdBy: null });
-  const [mapCenter, setMapCenter] = useState([51.505, -0.09]);
-  const [mapZoom, setMapZoom] = useState(18);
-  const [searchLocation, setSearchLocation] = useState(null);
-  const [showForm, setShowForm] = useState(false);
   const [user, setUser] = useState(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+
+  // Separate state for login and signup to prevent shared state issues
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [signupData, setSignupData] = useState({ name: "", email: "", password: "" });
 
   useEffect(() => {
     const savedUser = localStorage.getItem("cctvUser");
@@ -36,12 +14,6 @@ const CCTVFinder = () => {
       setUser(JSON.parse(savedUser));
     }
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      fetchPinpoints(); // Load pinpoints when user logs in
-    }
-  }, [user]);
 
   const API_URL = "/api/auth";
 
@@ -53,7 +25,7 @@ const CCTVFinder = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ action: "login", email, password }),
+        body: JSON.stringify({ action: "login", ...loginData }),
       });
 
       const data = await response.json();
@@ -61,7 +33,6 @@ const CCTVFinder = () => {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         alert("Login successful!");
-        fetchPinpoints(); // Fetch pinpoints after login
       } else {
         alert("Login failed: " + data.message);
       }
@@ -79,16 +50,14 @@ const CCTVFinder = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ action: "signup", email, password, name }),
+        body: JSON.stringify({ action: "signup", ...signupData }),
       });
 
       const data = await response.json();
-
       if (data.success) {
         setUser(data.user);
         localStorage.setItem("cctvUser", JSON.stringify(data.user));
         alert("Signup successful! You can now log in.");
-        fetchPinpoints(); // Fetch pinpoints after signup
       } else {
         alert(`Signup failed: ${data.message}`);
       }
@@ -124,7 +93,6 @@ const CCTVFinder = () => {
 
       if (result.success) {
         alert('Pinpoint saved!');
-        fetchPinpoints(); // Refresh pinpoints after saving
       } else {
         alert(`Failed to save pinpoint: ${result.message}`);
       }
@@ -134,58 +102,89 @@ const CCTVFinder = () => {
     }
   };
 
-  // ✅ Fetch Pinpoints Handler
-  const fetchPinpoints = async () => {
-    if (!user || !user.uid) return;
-
-    try {
-      const response = await fetch('/api/auth', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'getPinpoints', userId: user.uid }),
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        setMarkers(result.pinpoints);
-      } else {
-        alert(`Failed to fetch pinpoints: ${result.message}`);
-      }
-    } catch (error) {
-      console.error("❌ Error fetching pinpoints:", error.message);
-    }
-  };
-
   return (
-    <div className="h-screen w-full flex flex-col items-center bg-gray-100">
+    <div className="h-screen w-full flex justify-center items-center bg-gray-100">
       {!user ? (
-        <div className="flex flex-col items-center mt-20 bg-white p-6 shadow-lg rounded-lg">
-          <h2 className="text-2xl font-semibold">Login</h2>
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2 p-2 border rounded" />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 p-2 border rounded" />
-          <button onClick={handleLogin} className="mt-2 bg-blue-500 text-white p-2 rounded">Login</button>
-          <h2 className="text-2xl font-semibold mt-4">Sign Up</h2>
-          <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="mt-2 p-2 border rounded" />
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2 p-2 border rounded" />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 p-2 border rounded" />
-          <button onClick={handleSignup} className="mt-2 bg-green-500 text-white p-2 rounded">Sign Up</button>
+        <div className="bg-white p-10 rounded-lg shadow-xl w-full max-w-md">
+          <h1 className="text-3xl font-semibold text-center mb-6 text-gray-800">
+            {isSignUp ? "Create an Account" : "Welcome Back"}
+          </h1>
+          {isSignUp ? (
+            <>
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={signupData.name}
+                onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
+                className="w-full p-3 border rounded mb-4"
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={signupData.email}
+                onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                className="w-full p-3 border rounded mb-4"
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={signupData.password}
+                onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                className="w-full p-3 border rounded mb-4"
+              />
+              <button
+                onClick={handleSignup}
+                className="w-full bg-green-500 text-white p-3 rounded hover:bg-green-600 transition duration-300"
+              >
+                Sign Up
+              </button>
+            </>
+          ) : (
+            <>
+              <input
+                type="email"
+                placeholder="Email"
+                value={loginData.email}
+                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                className="w-full p-3 border rounded mb-4"
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                value={loginData.password}
+                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                className="w-full p-3 border rounded mb-4"
+              />
+              <button
+                onClick={handleLogin}
+                className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition duration-300"
+              >
+                Log In
+              </button>
+            </>
+          )}
+
+          {/* Switch between Login and Signup */}
+          <p className="mt-4 text-center text-gray-500">
+            {isSignUp ? "Already have an account?" : "Don't have an account?"}
+            <span
+              className="text-blue-500 cursor-pointer ml-1 hover:underline"
+              onClick={() => setIsSignUp(!isSignUp)}
+            >
+              {isSignUp ? "Log in" : "Sign up"}
+            </span>
+          </p>
         </div>
       ) : (
-        <>
-          <header className="w-full bg-gray-900 text-white text-center shadow-md">
-            <img src="https://i.ibb.co/Rp4vtYh/DALL-E-2025-03-05-21-35-01-A-sleek-modern-logo-representing-CCTV-surveillance-and-searching-featurin.webp" alt="CCTV Finder Logo" className="w-full object-cover" />
-          </header>
-          <div className="relative w-full max-w-5xl flex flex-col items-center mt-4">
-            <button
-              className="mt-4 bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
-              onClick={handleSavePinpoint}
-            >
-              ➕ Save Pinpoint
-            </button>
-          </div>
-        </>
+        <div className="text-center">
+          <h1 className="text-4xl font-semibold text-gray-800">Welcome, {user.email}!</h1>
+          <button
+            className="mt-6 bg-green-500 text-white p-3 rounded hover:bg-green-600"
+            onClick={handleSavePinpoint}
+          >
+            ➕ Save Pinpoint
+          </button>
+        </div>
       )}
     </div>
   );
